@@ -39,7 +39,12 @@ module RailsViewAnnotator
 
   module InstanceMethods
     def identifier
-      (@template = find_partial) ? @template.identifier : @path
+      @template = if Gem::Version.new(Rails.version) < Gem::Version.new(6)
+        find_partial
+      else
+        find_partial(@path, @template_keys)
+      end
+      @template ? @template.identifier : @path
     end
   end
 end
