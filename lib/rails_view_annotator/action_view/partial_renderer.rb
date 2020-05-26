@@ -31,7 +31,12 @@ module RailsViewAnnotator
           comment_pattern = "<!-- begin: %{comment} -->\n#{comment_pattern}<!-- end: %{comment} -->"
         end
 
-        (comment_pattern % {:partial => inner, :comment => descriptor}).html_safe
+        if Gem::Version.new(Rails.version) < Gem::Version.new(6)
+          (comment_pattern % {:partial => inner, :comment => descriptor}).html_safe
+        else
+          inner.instance_variable_set(:@body, (comment_pattern % {:partial => inner.body, :comment => descriptor}).html_safe)
+          inner
+        end
       end
     end
     klass.send(:include, InstanceMethods)
